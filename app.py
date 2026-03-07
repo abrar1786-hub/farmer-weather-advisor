@@ -4,7 +4,7 @@ import pandas as pd
 
 st.title("🌾 Farmer Climate Risk Advisor")
 
-API_KEY = "YOUR_API_KEY"
+API_KEY = "aafce6cf9cd8393e103087fe9ca4f55a"
 
 city = st.text_input("Enter your city")
 crop = st.selectbox("Select crop", ["Rice","Wheat","Maize","Cotton"])
