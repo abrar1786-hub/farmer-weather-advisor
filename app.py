@@ -1,41 +1,63 @@
 import streamlit as st
 import requests
+import pandas as pd
 
-API_KEY = "aafce6cf9cd8393e103087fe9ca4f55a"
+st.title("🌾 Farmer Climate Risk Advisor")
 
-st.title("🌾 Farmer Weather Advisor")
+API_KEY = "YOUR_API_KEY"
 
-city = st.text_input("Enter your city", "Coimbatore")
+city = st.text_input("Enter your city")
+crop = st.selectbox("Select crop", ["Rice","Wheat","Maize","Cotton"])
 
-if st.button("Check Weather"):
+if st.button("Check Risk"):
 
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
 
     response = requests.get(url)
     data = response.json()
 
-    temp = data["main"]["temp"]
-    humidity = data["main"]["humidity"]
-
-    st.subheader("Today's Weather")
-
-    st.write("Temperature:", temp, "°C")
-    st.write("Humidity:", humidity, "%")
-
-    st.subheader("Crop Risk Status")
-
-    if temp > 35:
-        st.error("⚠ High Heat Risk for Crops")
-        st.write("Advice: Increase irrigation and avoid spraying fertilizers during peak heat.")
-
-    elif temp < 20:
-        st.warning("⚠ Cold Stress Risk")
-        st.write("Advice: Protect crops from cold and reduce watering.")
-
-    elif humidity > 85:
-        st.warning("⚠ Possible Fungal Disease Risk")
-        st.write("Advice: Monitor crops for fungal infections.")
+    if response.status_code != 200:
+        st.error("City not found")
 
     else:
-        st.success("✅ Weather conditions are normal for crops")
-        st.write("Advice: Regular farming activities can continue.")
+
+        temp = data["main"]["temp"]
+        humidity = data["main"]["humidity"]
+
+        rainfall = 0
+        if "rain" in data:
+            rainfall = data["rain"].get("1h",0)
+
+        st.subheader("Weather Data")
+
+        st.write("Temperature:",temp,"°C")
+        st.write("Humidity:",humidity,"%")
+        st.write("Rainfall:",rainfall,"mm")
+
+        st.subheader("Risk Analysis")
+
+        if temp > 35:
+            st.error("🔥 Heat Risk")
+
+        if humidity > 80:
+            st.error("🐛 Pest Risk")
+
+        if rainfall > 80:
+            st.error("🌧 Flood Risk")
+
+        if rainfall < 5:
+            st.error("🌵 Drought Risk")
+
+        st.subheader("Advice for Farmers")
+
+        if temp > 35:
+            st.info("Irrigate crops early morning")
+
+        if rainfall > 80:
+            st.info("Ensure proper field drainage")
+
+        if rainfall < 5:
+            st.info("Use drip irrigation")
+
+        if humidity > 80:
+            st.info("Monitor pest infestation")
