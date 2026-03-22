@@ -4,7 +4,7 @@ import pandas as pd
 import json
 
 # -------------------------------
-# 🔑 API KEYS (PUT YOURS HERE)
+# 🔑 API KEYS
 # -------------------------------
 OPENWEATHER_API_KEY = "aafce6cf9cd8393e103087fe9ca4f55a"
 WEATHERAPI_KEY = "a8ac0e16da04492fa3f193535262203"
@@ -71,23 +71,29 @@ def merge_data(df1, df2):
     return df[["date", "tmax", "tmin", "humidity", "rainfall"]]
 
 # -------------------------------
-# ⚠️ RISK CALCULATION
+# ⚠️ RISK CALCULATION (FIXED)
 # -------------------------------
 def calculate_risk(row, crop):
+
     heat = "Low"
     drought = "Low"
     flood = "Low"
     pest = "Low"
 
+    # 🌡 Heat
     if row["tmax"] > crop["tmax"]:
         heat = "High"
 
+    # 🌵 Drought (FIXED LOGIC)
     if row["rainfall"] < crop["min_rainfall"]:
-        drought = "High"
+        if row["tmax"] > crop["tmin"]:   # only when crop can grow
+            drought = "High"
 
+    # 🌊 Flood
     if row["rainfall"] > crop["max_rainfall"]:
         flood = "High"
 
+    # 🐛 Pest
     if row["humidity"] > crop["humidity"] and 15 <= row["tmin"] <= 25:
         pest = "High"
 
@@ -139,36 +145,50 @@ if check:
             else:
                 df = merge_data(ow, wa)
 
-                st.subheader("📊 Weather Forecast")
-                st.dataframe(df)
+                # -------------------------------
+                # 🔥 MULTI-DAY RISK
+                # -------------------------------
+                all_risks = []
 
-                # Use first day for main risk
-                row = df.iloc[0]
+                for _, row in df.iterrows():
+                    heat, drought, flood, pest = calculate_risk(row, crop)
 
-                heat, drought, flood, pest = calculate_risk(row, crop)
+                    all_risks.append({
+                        "date": row["date"],
+                        "Heat": heat,
+                        "Drought": drought,
+                        "Flood": flood,
+                        "Pest": pest
+                    })
 
-                risks = {
-                    "Heat": heat,
-                    "Drought": drought,
-                    "Flood": flood,
-                    "Pest": pest
-                }
+                risk_df = pd.DataFrame(all_risks)
 
-                # 🔴 Find highest risk
-                major_risk = "None"
-                for k, v in risks.items():
-                    if v == "High":
-                        major_risk = k
-                        break
+                final_df = pd.merge(df, risk_df, on="date")
 
-                st.subheader("⚠️ Risk Analysis")
+                st.subheader("📊 Weather + Risk Forecast")
+                st.dataframe(final_df)
 
-                if major_risk != "None":
-                    st.error(f"🌡️ {major_risk} Risk Detected")
+                # -------------------------------
+                # 🔴 OVERALL RISK
+                # -------------------------------
+                risk_count = {"Heat": 0, "Drought": 0, "Flood": 0, "Pest": 0}
+
+                for _, row in risk_df.iterrows():
+                    for r in risk_count:
+                        if row[r] == "High":
+                            risk_count[r] += 1
+
+                major_risk = max(risk_count, key=risk_count.get)
+
+                st.subheader("⚠️ Overall Risk")
+
+                if risk_count[major_risk] > 0:
+                    st.error(f"🚨 {major_risk} Risk Dominates in Next Days")
                 else:
                     st.success("✅ No Major Risk")
 
+                # -------------------------------
+                # 🌿 ADVISORY
+                # -------------------------------
                 st.subheader("🌿 Advice for Farmers")
-
-                advice = get_advisory(major_risk)
-                st.info(advice)
+                st.info(get_advisory(major_risk))
