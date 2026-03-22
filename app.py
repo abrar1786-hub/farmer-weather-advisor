@@ -1,63 +1,202 @@
 import streamlit as st
 import requests
 import pandas as pd
+import numpy as np
+import json
 
-st.title("🌾 Farmer Climate Risk Advisor")
+# -------------------------------------------------------------
+# ⚙️ CONFIG
+# -------------------------------------------------------------
+OPENWEATHER_API_KEY = "aafce6cf9cd8393e103087fe9ca4f55a"
+WEATHERAPI_KEY = "a8ac0e16da04492fa3f193535262203"
 
-API_KEY = "aafce6cf9cd8393e103087fe9ca4f55a"
+NASA_POWER_BASE_URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
 
-city = st.text_input("Enter your city")
-crop = st.selectbox("Select crop", ["Rice","Wheat","Maize","Cotton"])
+# -------------------------------------------------------------
+# 📍 LOCATION
+# -------------------------------------------------------------
+def get_lat_lon(city):
+    url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
+    res = requests.get(url).json()
+    if not res:
+        return None, None
+    return res[0]["lat"], res[0]["lon"]
 
-if st.button("Check Risk"):
+# -------------------------------------------------------------
+# 🌤️ OPENWEATHER
+# -------------------------------------------------------------
+def fetch_openweather(lat, lon):
+    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric"
+    res = requests.get(url).json()
 
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    df = pd.DataFrame(res["list"])
+    df["dt_txt"] = pd.to_datetime(df["dt_txt"])
+    df["date"] = df["dt_txt"].dt.date
 
-    response = requests.get(url)
-    data = response.json()
+    df["tmax"] = df["main"].apply(lambda x: x["temp_max"])
+    df["tmin"] = df["main"].apply(lambda x: x["temp_min"])
+    df["humidity"] = df["main"].apply(lambda x: x["humidity"])
 
-    if response.status_code != 200:
-        st.error("City not found")
-
+    if "rain" in df:
+        df["rainfall"] = df["rain"].apply(lambda x: x.get("3h", 0) if isinstance(x, dict) else 0)
     else:
+        df["rainfall"] = 0
 
-        temp = data["main"]["temp"]
-        humidity = data["main"]["humidity"]
+    return df.groupby("date").agg({
+        "tmax": "max",
+        "tmin": "min",
+        "humidity": "mean",
+        "rainfall": "sum"
+    }).reset_index()
 
-        rainfall = 0
-        if "rain" in data:
-            rainfall = data["rain"].get("1h",0)
+# -------------------------------------------------------------
+# 🌦️ WEATHERAPI
+# -------------------------------------------------------------
+def fetch_weatherapi(city):
+    url = f"http://api.weatherapi.com/v1/forecast.json?key={WEATHERAPI_KEY}&q={city}&days=7"
+    res = requests.get(url).json()
 
-        st.subheader("Weather Data")
+    data = []
+    for d in res["forecast"]["forecastday"]:
+        data.append({
+            "date": d["date"],
+            "tmax": d["day"]["maxtemp_c"],
+            "tmin": d["day"]["mintemp_c"],
+            "rainfall": d["day"]["totalprecip_mm"],
+            "humidity": d["day"]["avghumidity"]
+        })
 
-        st.write("Temperature:",temp,"°C")
-        st.write("Humidity:",humidity,"%")
-        st.write("Rainfall:",rainfall,"mm")
+    return pd.DataFrame(data)
 
-        st.subheader("Risk Analysis")
+# -------------------------------------------------------------
+# ☀️ NASA BASELINE
+# -------------------------------------------------------------
+def fetch_nasa_power(lat, lon):
+    params = {
+        "parameters": "T2M_MAX,T2M_MIN,PRECTOTCORR,RH2M",
+        "community": "AG",
+        "longitude": lon,
+        "latitude": lat,
+        "start": "20000101",
+        "end": "20201231",
+        "format": "JSON",
+    }
 
-        if temp > 35:
-            st.error("🔥 Heat Risk")
+    res = requests.get(NASA_POWER_BASE_URL, params=params).json()
+    p = res["properties"]["parameter"]
 
-        if humidity > 80:
-            st.error("🐛 Pest Risk")
+    df = pd.DataFrame({
+        "tmax": list(p["T2M_MAX"].values()),
+        "tmin": list(p["T2M_MIN"].values()),
+        "rainfall": list(p["PRECTOTCORR"].values()),
+        "humidity": list(p["RH2M"].values())
+    })
 
-        if rainfall > 80:
-            st.error("🌧 Flood Risk")
+    df["date"] = pd.date_range("2000-01-01", "2020-12-31")
+    df["month"] = df["date"].dt.month
 
-        if rainfall < 5:
-            st.error("🌵 Drought Risk")
+    return df.groupby("month").mean().reset_index()
 
-        st.subheader("Advice for Farmers")
+# -------------------------------------------------------------
+# 🔄 MERGE
+# -------------------------------------------------------------
+def process_data(ow, wa):
+    if ow.empty:
+        return wa
+    if wa.empty:
+        return ow
 
-        if temp > 35:
-            st.info("Irrigate crops early morning")
+    df = pd.merge(ow, wa, on="date", suffixes=("_ow", "_wa"))
 
-        if rainfall > 80:
-            st.info("Ensure proper field drainage")
+    df["tmax"] = df[["tmax_ow", "tmax_wa"]].mean(axis=1)
+    df["tmin"] = df[["tmin_ow", "tmin_wa"]].mean(axis=1)
+    df["rainfall"] = df[["rainfall_ow", "rainfall_wa"]].mean(axis=1)
+    df["humidity"] = df[["humidity_ow", "humidity_wa"]].mean(axis=1)
 
-        if rainfall < 5:
-            st.info("Use drip irrigation")
+    return df[["date", "tmax", "tmin", "rainfall", "humidity"]]
 
-        if humidity > 80:
-            st.info("Monitor pest infestation")
+# -------------------------------------------------------------
+# ⚠️ RISK LOGIC (YOUR THRESHOLDS)
+# -------------------------------------------------------------
+def classify(val):
+    if val <= 2:
+        return "🟢 Low"
+    elif val <= 5:
+        return "🟡 Moderate"
+    else:
+        return "🔴 High"
+
+def calculate_risks(df, crop, base, crop_data):
+    results = []
+
+    for _, r in df.iterrows():
+        month = pd.to_datetime(r["date"]).month
+        b = base[base["month"] == month].iloc[0]
+        c = crop_data[crop]
+
+        # 🔥 Heat
+        heat = classify(r["tmax"] - c["tmax"]) if r["tmax"] > c["tmax"] else "🟢 Low"
+
+        # 🌵 Drought
+        drought = "🟢 Low"
+        if r["rainfall"] < c["min_rainfall"]:
+            drought = classify(abs(r["rainfall"] - b["rainfall"]))
+
+        # 🌊 Flood
+        flood = "🟢 Low"
+        if r["rainfall"] > c["max_rainfall"]:
+            flood = classify(r["rainfall"] - c["max_rainfall"])
+
+        # 🐛 Pest
+        pest = "🔴 High" if r["humidity"] > c["humidity"] and 15 <= r["tmin"] <= 25 else "🟢 Low"
+
+        results.append({
+            "Date": r["date"],
+            "Tmax": round(r["tmax"],1),
+            "Rainfall": round(r["rainfall"],1),
+            "Heat": heat,
+            "Drought": drought,
+            "Flood": flood,
+            "Pest": pest
+        })
+
+    return pd.DataFrame(results)
+
+# -------------------------------------------------------------
+# 🖥️ UI
+# -------------------------------------------------------------
+def main():
+    st.title("🌾 AgriGuard Climate Risk Predictor")
+
+    city = st.text_input("📍 Enter City")
+    crop = st.selectbox("🌱 Select Crop", ["rice", "wheat", "maize", "cotton"])
+
+    if not city:
+        st.info("Enter a city to start")
+        return
+
+    with open("crop_data.json") as f:
+        crop_data = json.load(f)
+
+    lat, lon = get_lat_lon(city)
+    if not lat:
+        st.error("City not found")
+        return
+
+    ow = fetch_openweather(lat, lon)
+    wa = fetch_weatherapi(city)
+    base = fetch_nasa_power(lat, lon)
+
+    merged = process_data(ow, wa)
+
+    if merged.empty or base.empty:
+        st.error("Data fetch failed")
+        return
+
+    result = calculate_risks(merged, crop, base, crop_data)
+
+    st.success("✅ Prediction Ready")
+    st.dataframe(result)
+
+if __name__ == "__main__":
+    main()
