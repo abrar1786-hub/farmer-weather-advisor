@@ -1,13 +1,3 @@
-Got it — you want this app to be robust, farmer‑friendly, and reliable, not just “working without errors.” Let’s refine your code so it produces consistent results even when APIs fail or data mismatches occur. Here’s a polished version with safeguards, unit normalization, and clearer logic:
-
-✅ Key Improvements
-- Safe NASA response handling (no crashes if fields are missing).
-- Date normalization between OpenWeather (UTC) and WeatherAPI (local).
-- Rainfall unit correction (convert OpenWeather’s 3h rainfall to daily mm).
-- Crop data loading with fallback (no crash if JSON missing).
-- Base climate lookup safe check (skip if month not found).
-- Cleaner risk/advisory logic.
-
 import streamlit as st
 import requests
 import pandas as pd
@@ -243,5 +233,3 @@ if st.button("🔍 Check Risk"):
 
             st.subheader("🌿 Advisory")
             st.info(get_advisory(major))
-
-
