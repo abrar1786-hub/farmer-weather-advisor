@@ -8,8 +8,8 @@ import json
 # -------------------------------------------------------------
 # 🔐 API KEYS (PUT YOUR KEYS HERE)
 # -------------------------------------------------------------
-OPENWEATHER_API_KEY = "YOUR_OPENWEATHER_KEY"
-WEATHERAPI_KEY = "YOUR_WEATHERAPI_KEY"
+OPENWEATHER_API_KEY = "aafce6cf9cd8393e103087fe9ca4f55a"
+WEATHERAPI_KEY = "a8ac0e16da04492fa3f193535262203"
 
 NASA_POWER_BASE_URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
 
