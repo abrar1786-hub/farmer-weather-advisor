@@ -201,14 +201,17 @@ if st.button("🔍 Check Risk"):
                 heat, drought, flood, pest = calculate_risk(row, crop, base)
 
                 all_rows.append({
-                    "date": row["date"],
-                    "tmax": row["tmax"],
-                    "rainfall": row["rainfall"],
-                    "Heat": heat,
-                    "Drought": drought,
-                    "Flood": flood,
-                    "Pest": pest
-                })
+    "date": row["date"],
+    "tmax": round(row["tmax"], 2),
+    "tmin": round(row["tmin"], 2),   # ✅ ADD THIS LINE
+    "rainfall": round(row["rainfall"], 2),
+    "humidity": round(row["humidity"], 2),  # (optional but useful)
+
+    "Heat": heat,
+    "Drought": drought,
+    "Flood": flood,
+    "Pest": pest
+})
 
             final = pd.DataFrame(all_rows)
 
