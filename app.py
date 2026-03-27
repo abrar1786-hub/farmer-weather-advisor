@@ -6,20 +6,21 @@ import json
 # -------------------------------
 # 🔑 API KEYS
 # -------------------------------
-OPENWEATHER_API_KEY = "aafce6cf9cd8393e103087fe9ca4f55a"
-WEATHERAPI_KEY = "a8ac0e16da04492fa3f193535262203"
+OPENWEATHER_API_KEY = "YOUR_OPENWEATHER_KEY"
+WEATHERAPI_KEY = "YOUR_WEATHERAPI_KEY"
 
 NASA_URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
 
 # -------------------------------
-# 📍 LOCATION
+# 📍 GET LAT/LON
 # -------------------------------
 def get_lat_lon(city):
-    url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
-    res = requests.get(url).json()
-    if not res:
+    try:
+        url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
+        res = requests.get(url).json()
+        return res[0]["lat"], res[0]["lon"]
+    except:
         return None, None
-    return res[0]["lat"], res[0]["lon"]
 
 # -------------------------------
 # 🌤 OPENWEATHER (FIXED)
@@ -40,7 +41,7 @@ def fetch_openweather(lat, lon):
 
     df = pd.DataFrame(data)
 
-    # ✅ FIX: correct aggregation
+    # ✅ FIXED aggregation
     df = df.groupby("date").agg({
         "tmax": "max",
         "tmin": "min",
@@ -70,38 +71,23 @@ def fetch_weatherapi(city):
     return pd.DataFrame(data)
 
 # -------------------------------
-# 🔥 SMART FUSION (IMPROVED)
+# 🔥 SMART FUSION
 # -------------------------------
 def fuse_data(df1, df2):
-
     merged = pd.merge(df1, df2, on="date", suffixes=("_ow", "_wa"))
     final = []
 
     for _, row in merged.iterrows():
 
-        # 🌡 TEMP
-        if abs(row["tmax_ow"] - row["tmax_wa"]) <= 3:
-            tmax = (row["tmax_ow"] + row["tmax_wa"]) / 2
-        else:
-            tmax = row["tmax_ow"]
+        # TEMP fusion
+        tmax = (row["tmax_ow"] + row["tmax_wa"]) / 2 if abs(row["tmax_ow"] - row["tmax_wa"]) <= 3 else row["tmax_wa"]
+        tmin = (row["tmin_ow"] + row["tmin_wa"]) / 2 if abs(row["tmin_ow"] - row["tmin_wa"]) <= 3 else row["tmin_wa"]
 
-        if abs(row["tmin_ow"] - row["tmin_wa"]) <= 3:
-            tmin = (row["tmin_ow"] + row["tmin_wa"]) / 2
-        else:
-            tmin = row["tmin_ow"]
+        # RAIN fusion
+        rain = (row["rain_ow"] + row["rain_wa"]) / 2 if abs(row["rain_ow"] - row["rain_wa"]) <= 10 else row["rain_wa"]
 
-        # 🌧 RAIN
-        if abs(row["rain_ow"] - row["rain_wa"]) <= 10:
-            rain = (row["rain_ow"] + row["rain_wa"]) / 2
-        else:
-            rain = row["rain_wa"]
-
-        # 💧 HUMIDITY
+        # HUMIDITY
         humidity = (row["humidity_ow"] + row["humidity_wa"]) / 2
-
-        # ✅ sanity check
-        if tmax < -10 or tmax > 55:
-            tmax = row["tmax_wa"]
 
         final.append({
             "date": row["date"],
@@ -148,10 +134,12 @@ def calculate_risk(row, crop, crop_data, base):
 
     c = crop_data[crop]
 
-    # HEAT
-    heat = "High" if row["tmax"] > c["tmax"] else "Low"
+    # HEAT (with tolerance)
+    heat = "Low"
+    if row["tmax"] > c["tmax"] + 2:
+        heat = "High"
 
-    # DROUGHT (FIXED)
+    # DROUGHT (corrected)
     drought = "Low"
     if row["rainfall"] < base["rainfall"] * 0.5 and row["tmax"] > 25:
         drought = "High"
@@ -163,20 +151,6 @@ def calculate_risk(row, crop, crop_data, base):
     pest = "High" if row["humidity"] > c["humidity"] and 15 <= row["tmin"] <= 30 else "Low"
 
     return heat, drought, flood, pest
-
-# -------------------------------
-# 🌿 ADVISORY
-# -------------------------------
-def get_advisory(risk):
-    if risk == "Heat":
-        return "🔥 Increase irrigation and avoid afternoon work"
-    if risk == "Drought":
-        return "🌵 Use drip irrigation and conserve water"
-    if risk == "Flood":
-        return "🌊 Ensure proper drainage"
-    if risk == "Pest":
-        return "🐛 Apply pest control measures"
-    return "✅ Normal farming conditions"
 
 # -------------------------------
 # 🖥 STREAMLIT UI
@@ -206,7 +180,6 @@ if st.button("Check Risk"):
 
         results = []
         for _, row in df.iterrows():
-
             month = pd.to_datetime(row["date"]).month
             base = base_df[base_df["month"] == month].iloc[0]
 
@@ -226,39 +199,48 @@ if st.button("Check Risk"):
         final = pd.DataFrame(results)
 
     # -------------------------------
-    # ⚠️ SHOW RESULT FIRST
+    # 🔥 DOMINANT RISK FIX
     # -------------------------------
-    risks = final[["Heat","Drought","Flood","Pest"]].values.flatten()
+    risk_count = {
+        "Heat": (final["Heat"] == "High").sum(),
+        "Drought": (final["Drought"] == "High").sum(),
+        "Flood": (final["Flood"] == "High").sum(),
+        "Pest": (final["Pest"] == "High").sum(),
+    }
 
-    if "High" in risks:
-        overall = "High"
+    if all(v == 0 for v in risk_count.values()):
+        main_risk = "None"
     else:
-        overall = "Low"
+        main_risk = max(risk_count, key=risk_count.get)
 
+    # -------------------------------
+    # ⚠️ OUTPUT
+    # -------------------------------
     st.subheader("⚠️ Overall Risk")
 
-    if overall == "High":
-        st.error("🚨 High Risk Detected")
-    else:
+    if main_risk == "None":
         st.success("✅ No Major Risk")
-
-    # Advisory
-    if "High" in final["Drought"].values:
-        advice = "🌵 Use water-saving techniques"
-    elif "High" in final["Heat"].values:
-        advice = "🔥 Avoid afternoon irrigation"
-    elif "High" in final["Flood"].values:
-        advice = "🌊 Ensure drainage"
-    elif "High" in final["Pest"].values:
-        advice = "🐛 Monitor pest activity"
     else:
-        advice = "✅ Conditions are normal"
-
-    st.subheader("🌿 Advisory")
-    st.info(advice)
+        st.error(f"🚨 {main_risk} Risk Detected")
 
     # -------------------------------
-    # 📊 TABLE AT BOTTOM
+    # 🌿 ADVISORY
+    # -------------------------------
+    st.subheader("🌿 Advisory")
+
+    if main_risk == "Heat":
+        st.info("🔥 Avoid afternoon work, increase irrigation")
+    elif main_risk == "Drought":
+        st.info("🌵 Use drip irrigation and conserve water")
+    elif main_risk == "Flood":
+        st.info("🌊 Ensure proper drainage")
+    elif main_risk == "Pest":
+        st.info("🐛 Monitor crops and apply pest control")
+    else:
+        st.info("✅ Normal farming conditions")
+
+    # -------------------------------
+    # 📊 TABLE LAST
     # -------------------------------
     st.subheader("📊 Detailed Forecast")
     st.dataframe(final)
