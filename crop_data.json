@@ -2,29 +2,43 @@
   "rice": {
     "tmax": 36,
     "tmin": 20,
-    "min_rainfall": 100,
-    "max_rainfall": 300,
+    "min_rainfall": 4,
+    "max_rainfall": 20,
     "humidity": 70
   },
   "wheat": {
     "tmax": 32,
     "tmin": 5,
-    "min_rainfall": 30,
-    "max_rainfall": 120,
+    "min_rainfall": 2,
+    "max_rainfall": 8,
     "humidity": 50
   },
   "maize": {
     "tmax": 34,
     "tmin": 18,
-    "min_rainfall": 50,
-    "max_rainfall": 150,
+    "min_rainfall": 3,
+    "max_rainfall": 12,
     "humidity": 60
   },
   "cotton": {
     "tmax": 38,
     "tmin": 15,
-    "min_rainfall": 50,
-    "max_rainfall": 120,
+    "min_rainfall": 2,
+    "max_rainfall": 10,
     "humidity": 50
+  },
+  "sugarcane": {
+    "tmax": 38,
+    "tmin": 18,
+    "min_rainfall": 5,
+    "max_rainfall": 25,
+    "humidity": 65
+  },
+  "tomato": {
+    "tmax": 33,
+    "tmin": 15,
+    "min_rainfall": 2,
+    "max_rainfall": 10,
+    "humidity": 55
   }
 }
