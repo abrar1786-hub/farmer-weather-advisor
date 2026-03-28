@@ -18,233 +18,138 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-html, body, [class*="css"], p, span, div, td, th, label, button {
+html, body, [class*="css"] {
     font-family: 'Inter', sans-serif !important;
 }
-
-body, .stApp { background-color: #f9fafb !important; }
+.stApp { background-color: #f9fafb !important; }
 .block-container { padding-top: 0 !important; max-width: 700px !important; }
 #MainMenu, footer, header { visibility: hidden; }
 
-/* ── Fix Streamlit expander arrow overlap ── */
-.streamlit-expanderHeader {
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    color: #374151 !important;
-    background: #f3f4f6 !important;
-    border-radius: 10px !important;
-    padding: 12px 16px !important;
-}
-.streamlit-expanderHeader:hover {
-    background: #e5e7eb !important;
-}
-.streamlit-expanderContent {
-    border: 1px solid #e5e7eb !important;
-    border-top: none !important;
-    border-radius: 0 0 10px 10px !important;
-    padding: 16px !important;
-    background: #ffffff !important;
-}
+/* ─ Brand ─ */
+.brand { text-align:center; padding:28px 0 14px; }
+.brand-title { font-size:1.85rem; font-weight:700; color:#14532d; letter-spacing:-0.5px; }
+.brand-sub   { font-size:0.82rem; color:#6b7280; margin-top:4px; }
 
-/* ── Brand ── */
-.brand {
-    text-align: center;
-    padding: 28px 0 14px 0;
-}
-.brand-title {
-    font-size: 1.85rem;
-    font-weight: 700;
-    color: #14532d;
-    letter-spacing: -0.5px;
-    line-height: 1;
-}
-.brand-sub {
-    font-size: 0.83rem;
-    color: #6b7280;
-    margin-top: 5px;
-    font-weight: 400;
-}
-
-/* ── Main risk card ── */
+/* ─ Main risk card ─ */
 .main-card {
-    border-radius: 18px;
-    padding: 28px 24px;
-    text-align: center;
-    margin: 18px 0 12px 0;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border-radius:18px; padding:28px 24px;
+    text-align:center; margin:18px 0 10px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.06);
 }
 .card-danger { background:#fff1f2; border:1.5px solid #fca5a5; }
 .card-warn   { background:#fffbeb; border:1.5px solid #fcd34d; }
 .card-safe   { background:#f0fdf4; border:1.5px solid #86efac; }
 
 .card-label {
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-    display: block;
+    display:block; font-size:0.68rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:2px; margin-bottom:8px;
 }
-.label-danger { color: #dc2626; }
-.label-warn   { color: #d97706; }
-.label-safe   { color: #16a34a; }
+.label-danger { color:#dc2626; }
+.label-warn   { color:#d97706; }
+.label-safe   { color:#16a34a; }
 
-.card-risk {
-    font-size: 1.9rem;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 4px;
-}
-.text-danger { color: #b91c1c; }
-.text-warn   { color: #b45309; }
-.text-safe   { color: #15803d; }
+.card-risk { font-size:1.9rem; font-weight:700; line-height:1.2; margin-bottom:4px; }
+.text-danger { color:#b91c1c; }
+.text-warn   { color:#b45309; }
+.text-safe   { color:#15803d; }
 
-.card-city {
-    font-size: 0.82rem;
-    color: #6b7280;
-    font-weight: 400;
-    margin-bottom: 16px;
-}
+.card-city { font-size:0.82rem; color:#6b7280; margin-bottom:16px; }
 
 .advisory-text {
-    font-size: 0.9rem;
-    color: #1f2937;
-    font-weight: 400;
-    line-height: 1.75;
-    background: rgba(255,255,255,0.8);
-    border-radius: 10px;
-    padding: 12px 16px;
-    text-align: left;
+    font-size:0.9rem; color:#1f2937; line-height:1.75;
+    background:rgba(255,255,255,0.8); border-radius:10px;
+    padding:12px 16px; text-align:left;
 }
 
-/* ── Risk pills ── */
+/* ─ Pills ─ */
 .pills-row {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: nowrap;
-    margin: 4px 0 6px 0;
+    display:flex; gap:10px; justify-content:center;
+    flex-wrap:nowrap; margin:4px 0 20px;
 }
 .pill {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 14px;
-    padding: 12px 0;
-    width: 80px;
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    display:flex; flex-direction:column; align-items:center;
+    border-radius:14px; padding:12px 0; width:80px;
+    background:#fff; border:1.5px solid #e5e7eb;
+    box-shadow:0 1px 4px rgba(0,0,0,0.05);
 }
-.pill-icon { font-size: 1.4rem; margin-bottom: 5px; line-height: 1; }
-.pill-val  { font-size: 0.8rem; font-weight: 700; line-height: 1; }
-.pill-name { font-size: 0.64rem; color: #9ca3af; text-transform: uppercase;
-             letter-spacing: 0.5px; margin-top: 3px; font-weight: 500; }
+.pill-icon { font-size:1.4rem; margin-bottom:5px; line-height:1; }
+.pill-val  { font-size:0.8rem; font-weight:700; line-height:1; }
+.pill-name { font-size:0.64rem; color:#9ca3af; text-transform:uppercase;
+             letter-spacing:0.5px; margin-top:3px; font-weight:500; }
+.pill-high   { border-color:#fca5a5; background:#fff1f2; }
+.pill-high   .pill-val { color:#b91c1c; }
+.pill-medium { border-color:#fcd34d; background:#fffbeb; }
+.pill-medium .pill-val { color:#b45309; }
+.pill-low    { border-color:#86efac; background:#f0fdf4; }
+.pill-low    .pill-val { color:#15803d; }
 
-.pill-high   { border-color: #fca5a5; background: #fff1f2; }
-.pill-high   .pill-val { color: #b91c1c; }
-.pill-medium { border-color: #fcd34d; background: #fffbeb; }
-.pill-medium .pill-val { color: #b45309; }
-.pill-low    { border-color: #86efac; background: #f0fdf4; }
-.pill-low    .pill-val { color: #15803d; }
+/* ─ Section divider button (replaces expander) ─ */
+.details-header {
+    background:#f3f4f6; border:1px solid #e5e7eb;
+    border-radius:10px; padding:12px 18px;
+    font-size:0.88rem; font-weight:600; color:#374151;
+    cursor:pointer; width:100%; text-align:left;
+    display:flex; justify-content:space-between; align-items:center;
+}
 
-/* ── Forecast table ── */
+/* ─ Forecast table ─ */
 .ft {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-    border-radius: 10px;
-    overflow: hidden;
-    table-layout: fixed;
+    width:100%; border-collapse:collapse;
+    font-size:0.82rem; border-radius:10px;
+    overflow:hidden; table-layout:fixed;
 }
 .ft th {
-    background: #14532d;
-    color: #ffffff !important;
-    padding: 10px 6px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
+    background:#14532d; color:#ffffff;
+    padding:10px 6px; text-align:center;
+    font-weight:600; font-size:0.72rem;
+    text-transform:uppercase; letter-spacing:0.5px;
+    white-space:nowrap;
 }
 .ft td {
-    padding: 8px 6px;
-    border-bottom: 1px solid #f3f4f6;
-    text-align: center;
-    color: #1f2937 !important;
-    font-weight: 400;
-    font-size: 0.8rem;
-    background: #ffffff;
-    white-space: nowrap;
+    padding:9px 6px; border-bottom:1px solid #f3f4f6;
+    text-align:center; color:#1f2937;
+    font-size:0.81rem; background:#ffffff;
+    white-space:nowrap;
 }
-.ft tr:nth-child(even) td { background: #f9fafb; }
-.ft tr:last-child td { border-bottom: none; }
+.ft tr:nth-child(even) td { background:#f9fafb; }
+.ft tr:last-child td { border-bottom:none; }
 
-/* ── Badges ── */
+/* ─ Badges ─ */
 .badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    white-space: nowrap;
+    display:inline-block; padding:3px 10px;
+    border-radius:20px; font-size:0.72rem; font-weight:700;
 }
-.badge-High   { background: #fee2e2; color: #b91c1c !important; }
-.badge-Medium { background: #fef3c7; color: #b45309 !important; }
-.badge-Low    { background: #dcfce7; color: #15803d !important; }
+.badge-High   { background:#fee2e2; color:#b91c1c; }
+.badge-Medium { background:#fef3c7; color:#b45309; }
+.badge-Low    { background:#dcfce7; color:#15803d; }
 
-/* ── Threshold table — FULLY VISIBLE ── */
+/* ─ Threshold table ─ */
 .thresh-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-    margin-top: 8px;
-    border-radius: 10px;
-    overflow: hidden;
-}
-.thresh-table thead tr {
-    background: #f3f4f6;
+    width:100%; border-collapse:collapse;
+    font-size:0.85rem; border-radius:10px; overflow:hidden;
+    margin-top:4px;
 }
 .thresh-table th {
-    padding: 10px 14px;
-    text-align: left;
-    font-weight: 700 !important;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #374151 !important;
+    background:#f3f4f6; padding:10px 14px; text-align:left;
+    font-weight:700; font-size:0.78rem; text-transform:uppercase;
+    letter-spacing:0.5px; color:#374151;
 }
 .thresh-table td {
-    padding: 10px 14px;
-    border-bottom: 1px solid #e5e7eb;
-    color: #111827 !important;
-    font-weight: 500 !important;
-    font-size: 0.85rem;
-    background: #ffffff;
+    padding:10px 14px; border-bottom:1px solid #e5e7eb;
+    background:#ffffff;
 }
-.thresh-table tr:last-child td { border-bottom: none; }
-.thresh-table .param-col { color: #374151 !important; font-weight: 500 !important; }
-.thresh-table .val-col   { color: #14532d !important; font-weight: 700 !important; }
+.thresh-table tr:last-child td { border-bottom:none; }
+.t-param { color:#374151; font-weight:500; }
+.t-val   { color:#14532d; font-weight:700; }
 
-/* ── Section label ── */
-.section-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: #6b7280;
-    margin: 16px 0 10px 0;
+/* ─ Section label ─ */
+.sec-lbl {
+    font-size:0.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:1.2px; color:#6b7280; margin:18px 0 10px;
 }
 
-/* ── Footer ── */
-.footer {
-    text-align: center;
-    font-size: 0.72rem;
-    color: #9ca3af;
-    padding: 20px 0 8px 0;
-}
+/* ─ Footer ─ */
+.footer { text-align:center; font-size:0.72rem; color:#9ca3af; padding:20px 0 8px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -301,7 +206,7 @@ def fetch_forecast(city: str) -> pd.DataFrame:
             "rainfall": item.get("rain", {}).get("3h", 0.0),
         })
 
-    df = pd.DataFrame(rows)
+    df    = pd.DataFrame(rows)
     daily = (
         df.groupby("date")
           .agg(tmax=("tmax","max"), tmin=("tmin","min"),
@@ -315,41 +220,41 @@ def fetch_forecast(city: str) -> pd.DataFrame:
     return daily.head(5).copy()
 
 # ─────────────────────────────────────────────
-# RISK LOGIC  — each function uses only its own vars
+# RISK LOGIC
 # ─────────────────────────────────────────────
-def heat_risk(tmax: float, crop_tmax: float) -> str:
-    if tmax > crop_tmax:          return "High"
-    if tmax >= crop_tmax - 3:     return "Medium"
+def heat_risk(tmax, crop_tmax):
+    if tmax > crop_tmax:           return "High"
+    if tmax >= crop_tmax - 3:      return "Medium"
     return "Low"
 
-def drought_risk(rainfall: float, min_rain: float) -> str:
-    if rainfall < min_rain:       return "High"
-    if rainfall <= min_rain + 10: return "Medium"
+def drought_risk(rainfall, min_rain):
+    if rainfall < min_rain:        return "High"
+    if rainfall <= min_rain + 10:  return "Medium"
     return "Low"
 
-def flood_risk(rainfall: float, max_rain: float) -> str:
-    if rainfall <= 0.0:           return "Low"
-    if rainfall > max_rain:       return "High"
-    if rainfall >= max_rain * 0.80: return "Medium"
+def flood_risk(rainfall, max_rain):
+    if rainfall <= 0.0:            return "Low"
+    if rainfall > max_rain:        return "High"
+    if rainfall >= max_rain * 0.8: return "Medium"
     return "Low"
 
-def pest_risk(humidity: float, tmin: float, crop_hum: float) -> str:
-    if tmin < 10.0:               return "Low"
-    if humidity > crop_hum:       return "High"
-    if humidity >= crop_hum - 10: return "Medium"
+def pest_risk(humidity, tmin, crop_hum):
+    if tmin < 10.0:                return "Low"
+    if humidity > crop_hum:        return "High"
+    if humidity >= crop_hum - 10:  return "Medium"
     return "Low"
 
-def apply_risks(daily: pd.DataFrame, thresholds: dict) -> pd.DataFrame:
+def apply_risks(daily, thresholds):
     df = daily.copy()
     df["Heat"]    = df.apply(lambda r: heat_risk(r["tmax"],     thresholds["tmax"]),            axis=1)
     df["Drought"] = df.apply(lambda r: drought_risk(r["rainfall"], thresholds["min_rainfall"]), axis=1)
     df["Flood"]   = df.apply(lambda r: flood_risk(r["rainfall"],   thresholds["max_rainfall"]), axis=1)
-    df["Pest"]    = df.apply(lambda r: pest_risk(r["humidity"],  r["tmin"], thresholds["humidity"]), axis=1)
+    df["Pest"]    = df.apply(lambda r: pest_risk(r["humidity"], r["tmin"], thresholds["humidity"]), axis=1)
     return df
 
 PRIORITY = ["Heat", "Drought", "Flood", "Pest"]
 
-def overall_risk(df: pd.DataFrame):
+def overall_risk(df):
     for col in PRIORITY:
         if (df[col] == "High").any():   return col, "High"
     for col in PRIORITY:
@@ -382,21 +287,21 @@ ADVISORY = {
         "Check again tomorrow for any changes.",
 }
 
-RISK_ICON = {
-    "Heat": "🌡️", "Drought": "🌵",
-    "Flood": "🌊", "Pest": "🐛", "No major risk": "✅",
-}
-PILL_ICON = {"Heat": "🔥", "Drought": "💧", "Flood": "🌊", "Pest": "🐛"}
+RISK_ICON = {"Heat":"🌡️","Drought":"🌵","Flood":"🌊","Pest":"🐛","No major risk":"✅"}
+PILL_ICON = {"Heat":"🔥","Drought":"💧","Flood":"🌊","Pest":"🐛"}
 
 # ─────────────────────────────────────────────
-# CHARTS
+# CHARTS  — annotations replaced with legend entries
+#           to avoid any text overlap on chart area
 # ─────────────────────────────────────────────
-FONT = dict(family="Inter", size=12, color="#374151")
+def fmt_dates(df):
+    return [datetime.strptime(d, "%Y-%m-%d").strftime("%b %d") for d in df["date"]]
 
-def temp_chart(df: pd.DataFrame, crop_tmax: float) -> go.Figure:
-    # Format dates cleanly: "Mar 28"
-    dates = [datetime.strptime(d, "%Y-%m-%d").strftime("%b %d") for d in df["date"]]
+def temp_chart(df, crop_tmax):
+    dates = fmt_dates(df)
     fig = go.Figure()
+
+    # Filled band
     fig.add_trace(go.Scatter(
         x=dates, y=df["tmax"], mode="lines+markers", name="Max °C",
         line=dict(color="#dc2626", width=2.5), marker=dict(size=7, color="#dc2626")
@@ -406,63 +311,89 @@ def temp_chart(df: pd.DataFrame, crop_tmax: float) -> go.Figure:
         line=dict(color="#2563eb", width=2.5), marker=dict(size=7, color="#2563eb"),
         fill="tonexty", fillcolor="rgba(147,197,253,0.15)"
     ))
-    fig.add_hline(
-        y=crop_tmax, line_dash="dot", line_color="#dc2626", line_width=1.5,
-        annotation_text=f"Crop limit {crop_tmax}°C",
-        annotation_font=dict(size=10, color="#dc2626"),
-        annotation_position="top left"
-    )
+    # Threshold as a trace (shows in legend, no annotation overlap)
+    fig.add_trace(go.Scatter(
+        x=dates,
+        y=[crop_tmax] * len(dates),
+        mode="lines",
+        name=f"Crop limit ({crop_tmax}°C)",
+        line=dict(color="#dc2626", width=1.5, dash="dot"),
+    ))
+
     fig.update_layout(
-        title=dict(text="Temperature Forecast", font=dict(size=12, color="#111827", family="Inter")),
-        height=250, margin=dict(l=0, r=0, t=32, b=0),
-        legend=dict(orientation="h", y=-0.35,
-                    font=dict(color="#374151", family="Inter", size=11)),
-        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-        font=FONT,
-        xaxis=dict(showgrid=False, tickfont=dict(color="#374151", size=11),
-                   title=dict(text="", font=dict(color="#374151"))),
-        yaxis=dict(gridcolor="#f3f4f6", tickfont=dict(color="#374151", size=11),
-                   title=dict(text="°C", font=dict(color="#374151"))),
+        title=None,
+        height=260,
+        margin=dict(l=10, r=10, t=10, b=10),
+        legend=dict(
+            orientation="h", y=-0.28, x=0,
+            font=dict(size=11, color="#374151", family="Inter"),
+            bgcolor="rgba(0,0,0,0)"
+        ),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter", size=11, color="#374151"),
+        xaxis=dict(showgrid=False,
+                   tickfont=dict(color="#374151", size=11, family="Inter"),
+                   linecolor="#e5e7eb"),
+        yaxis=dict(gridcolor="#f3f4f6",
+                   tickfont=dict(color="#374151", size=11, family="Inter"),
+                   title=dict(text="°C", font=dict(color="#374151", size=11)),
+                   linecolor="#e5e7eb"),
     )
     return fig
 
-def rain_chart(df: pd.DataFrame, min_rain: float, max_rain: float) -> go.Figure:
-    dates = [datetime.strptime(d, "%Y-%m-%d").strftime("%b %d") for d in df["date"]]
-    fig = go.Figure(go.Bar(
+
+def rain_chart(df, min_rain, max_rain):
+    dates = fmt_dates(df)
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
         x=dates, y=df["rainfall"],
         marker_color="#16a34a", marker_line_color="#14532d", marker_line_width=1,
+        name="Rainfall (mm)"
     ))
-    fig.add_hline(
-        y=min_rain, line_dash="dot", line_color="#d97706", line_width=1.5,
-        annotation_text=f"Min {min_rain}mm",
-        annotation_font=dict(size=10, color="#d97706"),
-        annotation_position="top left"
-    )
-    fig.add_hline(
-        y=max_rain, line_dash="dot", line_color="#dc2626", line_width=1.5,
-        annotation_text=f"Max {max_rain}mm",
-        annotation_font=dict(size=10, color="#dc2626"),
-        annotation_position="top right"
-    )
+    # Threshold lines as traces — no annotation text on chart
+    fig.add_trace(go.Scatter(
+        x=dates, y=[min_rain] * len(dates), mode="lines",
+        name=f"Min ({min_rain}mm)",
+        line=dict(color="#d97706", width=1.5, dash="dot"),
+    ))
+    fig.add_trace(go.Scatter(
+        x=dates, y=[max_rain] * len(dates), mode="lines",
+        name=f"Max ({max_rain}mm)",
+        line=dict(color="#dc2626", width=1.5, dash="dot"),
+    ))
+
     fig.update_layout(
-        title=dict(text="Rainfall Forecast", font=dict(size=12, color="#111827", family="Inter")),
-        height=240, margin=dict(l=0, r=0, t=32, b=0),
-        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-        font=FONT, showlegend=False,
-        xaxis=dict(showgrid=False, tickfont=dict(color="#374151", size=11),
-                   title=dict(text="", font=dict(color="#374151"))),
-        yaxis=dict(gridcolor="#f3f4f6", tickfont=dict(color="#374151", size=11),
-                   title=dict(text="mm", font=dict(color="#374151"))),
+        title=None,
+        height=240,
+        margin=dict(l=10, r=10, t=10, b=10),
+        legend=dict(
+            orientation="h", y=-0.3, x=0,
+            font=dict(size=11, color="#374151", family="Inter"),
+            bgcolor="rgba(0,0,0,0)"
+        ),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter", size=11, color="#374151"),
+        xaxis=dict(showgrid=False,
+                   tickfont=dict(color="#374151", size=11, family="Inter"),
+                   linecolor="#e5e7eb"),
+        yaxis=dict(gridcolor="#f3f4f6",
+                   tickfont=dict(color="#374151", size=11, family="Inter"),
+                   title=dict(text="mm", font=dict(color="#374151", size=11)),
+                   linecolor="#e5e7eb"),
     )
     return fig
 
+
 # ─────────────────────────────────────────────
-# HELPERS
+# HTML HELPERS
 # ─────────────────────────────────────────────
-def badge(val: str) -> str:
+def badge(val):
     return f'<span class="badge badge-{val}">{val}</span>'
 
-def pill_html(name: str, val: str) -> str:
+def pill_html(name, val):
     return (
         f'<div class="pill pill-{val.lower()}">'
         f'<span class="pill-icon">{PILL_ICON[name]}</span>'
@@ -476,7 +407,7 @@ def pill_html(name: str, val: str) -> str:
 # ─────────────────────────────────────────────
 crop_data = load_crop_data()
 
-# Brand header
+# Brand
 st.markdown("""
 <div class="brand">
   <div class="brand-title">🌾 AgriGuard</div>
@@ -487,20 +418,20 @@ st.markdown("""
 # Inputs
 c1, c2 = st.columns([2, 1])
 with c1:
-    city = st.text_input("City", placeholder="Enter your city (e.g. Chennai, Pune)",
+    city = st.text_input("city", placeholder="Enter your city (e.g. Chennai, Pune)",
                          label_visibility="collapsed")
 with c2:
-    crop = st.selectbox("Crop", list(crop_data.keys()),
+    crop = st.selectbox("crop", list(crop_data.keys()),
                         format_func=lambda x: x.capitalize(),
                         label_visibility="collapsed")
 
 run = st.button("Check Risk →", use_container_width=True, type="primary")
 
-# Landing state
+# Landing
 if not run:
     st.markdown("""
-    <div style="text-align:center; color:#9ca3af; padding:48px 0;
-                font-size:0.88rem; font-weight:400; font-family:'Inter',sans-serif;">
+    <div style="text-align:center;color:#9ca3af;padding:48px 0;
+                font-size:0.88rem;font-family:'Inter',sans-serif;">
         Enter your city and crop above, then tap <b style="color:#6b7280;">Check Risk</b>
     </div>""", unsafe_allow_html=True)
     st.stop()
@@ -517,54 +448,63 @@ with st.spinner("Checking weather…"):
 
 risk_type, severity = overall_risk(result)
 
-# Card style selectors
+# Card selectors
 if severity == "None":
-    card_css, label_css, text_css, label_text = "card-safe",   "label-safe",   "text-safe",   "ALL CLEAR"
+    cc, lc, tc, lt = "card-safe",   "label-safe",   "text-safe",   "ALL CLEAR"
 elif severity == "High":
-    card_css, label_css, text_css, label_text = "card-danger", "label-danger", "text-danger", "RISK DETECTED"
+    cc, lc, tc, lt = "card-danger", "label-danger", "text-danger", "RISK DETECTED"
 else:
-    card_css, label_css, text_css, label_text = "card-warn",   "label-warn",   "text-warn",   "CAUTION"
+    cc, lc, tc, lt = "card-warn",   "label-warn",   "text-warn",   "CAUTION"
 
 display = "No Major Risk" if risk_type == "No major risk" else f"{risk_type} Risk"
 
-# ── Main risk card ────────────────────────────
+# ── Main card ─────────────────────────────────
 st.markdown(f"""
-<div class="main-card {card_css}">
-  <span class="card-label {label_css}">{label_text}</span>
-  <div class="card-risk {text_css}">{RISK_ICON[risk_type]} {display}</div>
+<div class="main-card {cc}">
+  <span class="card-label {lc}">{lt}</span>
+  <div class="card-risk {tc}">{RISK_ICON[risk_type]} {display}</div>
   <div class="card-city">{city.title()} &middot; {crop.capitalize()} &middot; Next 5 Days</div>
   <div class="advisory-text">{ADVISORY[risk_type]}</div>
 </div>
 """, unsafe_allow_html=True)
 
-# ── 4 risk pills ──────────────────────────────
-day_risks = {col: result[col].mode()[0] for col in PRIORITY}
+# ── Pills ─────────────────────────────────────
+day_risks  = {col: result[col].mode()[0] for col in PRIORITY}
 pills_html = '<div class="pills-row">' + \
-    "".join(pill_html(name, day_risks[name]) for name in PRIORITY) + \
+    "".join(pill_html(n, day_risks[n]) for n in PRIORITY) + \
     "</div>"
 st.markdown(pills_html, unsafe_allow_html=True)
 
-# ── Details expander ─────────────────────────
-with st.expander("View Detailed Forecast & Charts"):
+# ── Details section — using st.expander cleanly ──
+# We avoid any HTML inside the expander label to prevent
+# Streamlit injecting "arrow_down" text artifacts.
+show_details = st.checkbox("📋  View Detailed Forecast & Charts", value=False)
 
+if show_details:
+    st.markdown("---")
+
+    # Charts
     col1, col2 = st.columns(2)
     with col1:
-        st.plotly_chart(temp_chart(daily, thresholds["tmax"]), use_container_width=True)
+        st.markdown("**🌡️ Temperature Forecast**")
+        st.plotly_chart(temp_chart(daily, thresholds["tmax"]),
+                        use_container_width=True)
     with col2:
-        st.plotly_chart(rain_chart(daily, thresholds["min_rainfall"], thresholds["max_rainfall"]),
+        st.markdown("**🌧️ Rainfall Forecast**")
+        st.plotly_chart(rain_chart(daily, thresholds["min_rainfall"],
+                                   thresholds["max_rainfall"]),
                         use_container_width=True)
 
-    # ── 5-day table ──────────────────────────
-    st.markdown('<div class="section-label">5-Day Risk Breakdown</div>',
+    # Table
+    st.markdown('<div class="sec-lbl">5-Day Risk Breakdown</div>',
                 unsafe_allow_html=True)
 
     rows_html = ""
     for _, row in result.iterrows():
-        # Format date as "Mar 28" — no wrapping
-        pretty_date = datetime.strptime(row["date"], "%Y-%m-%d").strftime("%b %d")
+        d = datetime.strptime(row["date"], "%Y-%m-%d").strftime("%b %d")
         rows_html += (
             f"<tr>"
-            f"<td>{pretty_date}</td>"
+            f"<td>{d}</td>"
             f"<td>{row['tmax']:.1f}°C</td>"
             f"<td>{row['tmin']:.1f}°C</td>"
             f"<td>{row['humidity']:.0f}%</td>"
@@ -578,46 +518,26 @@ with st.expander("View Detailed Forecast & Charts"):
 
     st.markdown(f"""
 <table class="ft">
-  <thead>
-    <tr>
-      <th>Date</th><th>Tmax</th><th>Tmin</th>
-      <th>Hum</th><th>Rain</th>
-      <th>Heat</th><th>Drought</th><th>Flood</th><th>Pest</th>
-    </tr>
-  </thead>
+  <thead><tr>
+    <th>Date</th><th>Tmax</th><th>Tmin</th>
+    <th>Hum</th><th>Rain</th>
+    <th>Heat</th><th>Drought</th><th>Flood</th><th>Pest</th>
+  </tr></thead>
   <tbody>{rows_html}</tbody>
 </table>""", unsafe_allow_html=True)
 
-    # ── Crop thresholds ───────────────────────
-    st.markdown('<div class="section-label" style="margin-top:20px;">Crop Thresholds</div>',
+    # Thresholds
+    st.markdown('<div class="sec-lbl" style="margin-top:20px;">Crop Thresholds</div>',
                 unsafe_allow_html=True)
-
     t = thresholds
     st.markdown(f"""
 <table class="thresh-table">
-  <thead>
-    <tr>
-      <th>Parameter</th>
-      <th>Value</th>
-    </tr>
-  </thead>
+  <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
   <tbody>
-    <tr>
-      <td class="param-col">Max Temperature</td>
-      <td class="val-col">{t['tmax']} °C</td>
-    </tr>
-    <tr>
-      <td class="param-col">Min Daily Rainfall</td>
-      <td class="val-col">{t['min_rainfall']} mm</td>
-    </tr>
-    <tr>
-      <td class="param-col">Max Daily Rainfall</td>
-      <td class="val-col">{t['max_rainfall']} mm</td>
-    </tr>
-    <tr>
-      <td class="param-col">Max Humidity</td>
-      <td class="val-col">{t['humidity']} %</td>
-    </tr>
+    <tr><td class="t-param">Max Temperature</td><td class="t-val">{t['tmax']} °C</td></tr>
+    <tr><td class="t-param">Min Daily Rainfall</td><td class="t-val">{t['min_rainfall']} mm</td></tr>
+    <tr><td class="t-param">Max Daily Rainfall</td><td class="t-val">{t['max_rainfall']} mm</td></tr>
+    <tr><td class="t-param">Max Humidity</td><td class="t-val">{t['humidity']} %</td></tr>
   </tbody>
 </table>""", unsafe_allow_html=True)
 
